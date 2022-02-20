@@ -1,6 +1,6 @@
 async function scheduleHtmlProvider() {
 	await loadTool("AIScheduleTools")
-	await AIScheduleAlert("暂时无法完美适配单双周课程 请见谅")
+	await AIScheduleAlert("请务必打开'课程信息'页后 再执行导入操作")
 	let userid
 	let str
 	try {
@@ -48,7 +48,7 @@ async function scheduleHtmlProvider() {
 		"userName=" +
 		parseInt(userid) +
 		"&currentTime=" +
-		formatDate(date) +
+		formatDate(data) +
 		"&role=1"
 
 	console.log(body)
