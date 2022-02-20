@@ -22,8 +22,6 @@ async function scheduleHtmlProvider() {
 		return "do not continue"
 	}
 
-	let date = new Date()
-
 	let handleTime = (time) => {
 		if (time < 10) {
 			return "0" + time
@@ -31,24 +29,39 @@ async function scheduleHtmlProvider() {
 			return time
 		}
 	}
-	const formatDate = (current_datetime) => {
-		let formatted_date =
-			current_datetime.getFullYear() +
-			"-" +
-			handleTime(current_datetime.getMonth() + 1) +
-			"-" +
-			handleTime(current_datetime.getDate())
+	let handleDate = () => {
+		let date_1 = new Date()
+		let nowTime = date_1.getTime()
+		let oneWeek = 24 * 60 * 60 * 1000 * 7
+		let date_2 = new Date(nowTime + oneWeek)
+		let formatted_date = []
 
+		let dateStr_1 =
+			date_1.getFullYear() +
+			"-" +
+			handleTime(date_1.getMonth() + 1) +
+			"-" +
+			handleTime(date_1.getDate())
+
+		let dateStr_2 =
+			date_2.getFullYear() +
+			"-" +
+			handleTime(date_2.getMonth() + 1) +
+			"-" +
+			handleTime(date_2.getDate())
+
+		formatted_date = [dateStr_1, dateStr_2]
 		return formatted_date
 	}
 
-	console.log(formatDate(date))
+	console.log(handleDate())
 
+	let result = []
 	body =
 		"userName=" +
 		parseInt(userid) +
 		"&currentTime=" +
-		formatDate(data) +
+		handleDate()[0] +
 		"&role=1"
 
 	console.log(body)
@@ -64,13 +77,55 @@ async function scheduleHtmlProvider() {
 		})
 			.then((response) => response.json())
 			.then((data) => {
-				str = JSON.stringify(data)
-				console.log(str)
+				if (!data.success) {
+					AIScheduleAlert(
+						"还没开学？无法获取这周课表。可能无法正确导入单双周课程。"
+					)
+				}
+				// str = JSON.stringify(data)
+
+				result.push(data)
 			})
-		return str
 	} catch (error) {
 		console.error(error)
 		await AIScheduleAlert(error.message)
 		return "do not continue"
 	}
+
+	body =
+		"userName=" +
+		parseInt(userid) +
+		"&currentTime=" +
+		handleDate()[1] +
+		"&role=1"
+
+	console.log(body)
+	url = "http://microapp.zzuli.edu.cn/microapplication/app/course/getCourse"
+	try {
+		const res = await fetch(url, {
+			method: "POST",
+			body: body,
+			headers: {
+				"Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+			},
+			credentials: "include",
+		})
+			.then((response) => response.json())
+			.then((data) => {
+				if (!data.success) {
+					AIScheduleAlert(
+						"快期末了？无法获取下周课表。可能无法正确导入单双周课程。"
+					)
+				}
+				// str = JSON.stringify(data)
+
+				result.push(data)
+			})
+	} catch (error) {
+		console.error(error)
+		await AIScheduleAlert(error.message)
+		return "do not continue"
+	}
+
+	return JSON.stringify(result)
 }
