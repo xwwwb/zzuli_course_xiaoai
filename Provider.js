@@ -1,6 +1,6 @@
 async function scheduleHtmlProvider() {
 	await loadTool("AIScheduleTools")
-	await AIScheduleAlert("请务必打开'课程信息'页后 再执行导入操作")
+	await AIScheduleAlert("请务必打开'课程信息'页后 再执行导入操作 若还未开学或者临近期末 可能无法正确处理单双周课程")
 	let userid
 	let str
 	try {
@@ -77,11 +77,11 @@ async function scheduleHtmlProvider() {
 		})
 			.then((response) => response.json())
 			.then((data) => {
-				if (!data.success) {
-					AIScheduleAlert(
-						"还没开学？无法获取这周课表。可能无法正确导入单双周课程。"
-					)
-				}
+				// if (!data.success) {
+				// 	AIScheduleAlert(
+				// 		"还没开学？无法获取这周课表。可能无法正确导入单双周课程。"
+				// 	)
+				// }
 				// str = JSON.stringify(data)
 
 				result.push(data)
@@ -112,11 +112,11 @@ async function scheduleHtmlProvider() {
 		})
 			.then((response) => response.json())
 			.then((data) => {
-				if (!data.success) {
-					AIScheduleAlert(
-						"快期末了？无法获取下周课表。可能无法正确导入单双周课程。"
-					)
-				}
+				// if (!data.success) {
+				// 	AIScheduleAlert(
+				// 		"快期末了？无法获取下周课表。可能无法正确导入单双周课程。"
+				// 	)
+				// }
 				// str = JSON.stringify(data)
 
 				result.push(data)
