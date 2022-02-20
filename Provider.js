@@ -17,9 +17,8 @@ async function scheduleHtmlProvider() {
 				userid = data.attributes.modules.memberId
 			})
 	} catch (error) {
-		console.error(error)
-		await AIScheduleAlert(error.message)
-		return "do not continue"
+		await AIScheduleAlert("请务必打开'课程信息'页后 再执行导入操作 ")
+		return 'do not continue'
 	}
 
 	let handleTime = (time) => {
