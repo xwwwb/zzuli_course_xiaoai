@@ -34,123 +34,67 @@ getName = (name) => {
 		return name
 	}
 }
-getWeeks = (weeks) => {
-	let arr = weeks.split("-")
+getWeeks = (weeks, isSingleWeek) => {
 	let num_arr = []
+	let new_arr = []
+	let arr = weeks.split("-")
 	arr.map((item) => {
 		num_arr.push(parseInt(item))
 	})
-	let new_arr = []
-	for (let i = num_arr[0]; i <= num_arr[1]; i++) {
-		new_arr.push(i)
-	}
-	return new_arr
-}
-handleSingleWeeks = (weeks) => {
-	let arr = weeks.split("-")
-	let num_arr = []
-	arr.map((item) => {
-		num_arr.push(parseInt(item))
-	})
-	let new_arr = []
-	for (let i = num_arr[0]; i <= num_arr[1]; i++) {
-		if (i % 2 == 1) {
+	if (isSingleWeek === 0) {
+		for (let i = num_arr[0]; i <= num_arr[1]; i++) {
 			new_arr.push(i)
 		}
-	}
-	return new_arr
-}
-handleDoubleWeeks = (weeks) => {
-	let arr = weeks.split("-")
-	let num_arr = []
-	arr.map((item) => {
-		num_arr.push(parseInt(item))
-	})
-	let new_arr = []
-	for (let i = num_arr[0]; i <= num_arr[1]; i++) {
-		if (i % 2 == 0) {
-			new_arr.push(i)
+	} else if (isSingleWeek === 1) {
+		for (let i = num_arr[0]; i <= num_arr[1]; i++) {
+			if (i % 2 == 1) {
+				new_arr.push(i)
+			}
+		}
+	} else if (isSingleWeek === 2) {
+		for (let i = num_arr[0]; i <= num_arr[1]; i++) {
+			if (i % 2 == 0) {
+				new_arr.push(i)
+			}
 		}
 	}
 	return new_arr
 }
 
 // 以下三个开发暂未完成
-getWeeksSpec = (weeks) => {
-	let arr = weeks.split("-")
-	let num_arr = []
-	arr.map((item) => {
-		num_arr.push(parseInt(item))
-	})
+getWeeksSpec = (weeks, isSingleWeek) => {
+	let _arr = weeks.split(",")
 	let new_arr = []
-	for (let i = num_arr[0]; i <= num_arr[1]; i++) {
-		new_arr.push(i)
-	}
+	_arr.map((weeks) => {
+		new_arr = new_arr.concat(getWeeks(weeks,isSingleWeek))
+	})
 	return new_arr
 }
-handleSingleWeeksSpec = (weeks) => {
-	let arr = weeks.split("-")
-	let num_arr = []
-	arr.map((item) => {
-		num_arr.push(parseInt(item))
-	})
-	let new_arr = []
-	for (let i = num_arr[0]; i <= num_arr[1]; i++) {
-		if (i % 2 == 1) {
-			new_arr.push(i)
-		}
-	}
-	return new_arr
-}
-handleDoubleWeeksSpec = (weeks) => {
-	let arr = weeks.split("-")
-	let num_arr = []
-	arr.map((item) => {
-		num_arr.push(parseInt(item))
-	})
-	let new_arr = []
-	for (let i = num_arr[0]; i <= num_arr[1]; i++) {
-		if (i % 2 == 0) {
-			new_arr.push(i)
-		}
-	}
-	return new_arr
-}
-
 
 function scheduleHtmlParser(html) {
 	let result = [] //结果
 	let duplicate = [] //查重用
 	let data = JSON.parse(html)
 	data.map((data) => {
-		if (data.success) {
+		if (data.success === true && data.obj !== null) {
 			let obj = data.obj
 			obj.map((item) => {
 				let weeks
 				// 长度小于5 说明是正常的周
-				if (item.courseWeekly.length < 5) {
-					if (item.courseSingleDoubleWeek == "0") {
-						weeks = getWeeks(item.courseWeekly)
-						console.log("不存在单双周问题")
-					} else if (item.courseSingleDoubleWeek == "1") {
-						weeks = handleSingleWeeks(item.courseWeekly)
-						console.log("此为单周课")
-					} else if (item.courseSingleDoubleWeek == "2") {
-						weeks = handleDoubleWeeks(item.courseWeekly)
-						console.log("此为双周课")
-					}
+				if (item.courseWeekly.length <= 5) {
+					console.log("正常周")
+					weeks = getWeeks(
+						item.courseWeekly,
+						parseInt(item.courseSingleDoubleWeek)
+					)
 				} else {
 					// 长度大于5 特殊周
-					if (item.courseSingleDoubleWeek == "0") {
-						weeks = getWeeksSpec(item.courseWeekly)
-						console.log("不存在单双周问题")
-					} else if (item.courseSingleDoubleWeek == "1") {
-						weeks = handleSingleWeeksSpec(item.courseWeekly)
-						console.log("此为单周课")
-					} else if (item.courseSingleDoubleWeek == "2") {
-						weeks = handleDoubleWeeksSpec(item.courseWeekly)
-						console.log("此为双周课")
-					}
+					console.log("特殊周")
+					weeks = getWeeksSpec(
+						item.courseWeekly,
+						parseInt(item.courseSingleDoubleWeek)
+					)
+					console.log(item.courseName)
 				}
 				let course = {
 					name: getName(item.courseName), // 课程名称
@@ -160,9 +104,9 @@ function scheduleHtmlParser(html) {
 					day: getDay(item.courseDate), // 星期
 					sections: getSections(item.courseSection), // 节次
 				}
-				if (!duplicate.includes(item)) {
+				if (!duplicate.includes(JSON.stringify(course))) {
 					result.push(course)
-					duplicate.push(item)
+					duplicate.push(JSON.stringify(course))
 				}
 			})
 		} else {
