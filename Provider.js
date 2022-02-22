@@ -7,7 +7,7 @@ let handleTime = (time) => {
 }
 // 生成18个日期 获取整个学期课表 防止遗漏
 let handleDate = () => {
-	let date_now = new Date(2022, 2, 22)
+	let date_now = new Date(2022, 1, 22)
 	let nowTime = date_now.getTime()
 	let oneWeek = 24 * 60 * 60 * 1000 * 7
 	let formatted_date = []
